@@ -3,10 +3,10 @@ package voldemort.xfaban;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import voldemort.TestUtils;
 import voldemort.store.StorageEngine;
+import voldemort.versioning.VectorClock;
 
 import com.g414.dgen.EntityGenerator;
 import com.google.inject.Inject;
@@ -21,7 +21,7 @@ public class VoldemortStorageEngineScenarioBase {
 	@Inject
 	protected EntityGenerator entityGen;
 
-	protected AtomicInteger serial = new AtomicInteger(1);
+	protected AtomicLong serial = new AtomicLong(1);
 
 	protected Random random = new Random();
 
@@ -32,8 +32,8 @@ public class VoldemortStorageEngineScenarioBase {
 		String nextId = nextLong.toString();
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.insert(store, entity,
-				TestUtils.getClock(serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.insert(store, entity, new VectorClock(
+				serial.getAndIncrement()));
 
 		this.maxId = nextLong;
 	}
@@ -61,8 +61,8 @@ public class VoldemortStorageEngineScenarioBase {
 				% (this.maxId - 500));
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.insert(store, entity,
-				TestUtils.getClock(serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.insert(store, entity, new VectorClock(
+				serial.getAndIncrement()));
 	}
 
 	public void deleteImpl() throws Exception {
@@ -75,7 +75,7 @@ public class VoldemortStorageEngineScenarioBase {
 				% (this.maxId - 500));
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.delete(store, entity,
-				TestUtils.getClock(serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.delete(store, entity, new VectorClock(
+				serial.getAndIncrement()));
 	}
 }
