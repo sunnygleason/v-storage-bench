@@ -3,6 +3,7 @@ package voldemort.xfaban;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import voldemort.TestUtils;
 import voldemort.store.StorageEngine;
@@ -20,6 +21,8 @@ public class VoldemortStorageEngineScenarioBase {
 	@Inject
 	protected EntityGenerator entityGen;
 
+	protected AtomicInteger serial = new AtomicInteger(1);
+
 	protected Random random = new Random();
 
 	protected volatile long maxId = 0;
@@ -30,7 +33,7 @@ public class VoldemortStorageEngineScenarioBase {
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
 		VoldemortStorageEngineOperations.insert(store, entity,
-				TestUtils.getClock(1));
+				TestUtils.getClock(serial.getAndIncrement()));
 
 		this.maxId = nextLong;
 	}
@@ -59,7 +62,7 @@ public class VoldemortStorageEngineScenarioBase {
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
 		VoldemortStorageEngineOperations.insert(store, entity,
-				TestUtils.getClock(1));
+				TestUtils.getClock(serial.getAndIncrement()));
 	}
 
 	public void deleteImpl() throws Exception {
@@ -73,6 +76,6 @@ public class VoldemortStorageEngineScenarioBase {
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
 		VoldemortStorageEngineOperations.delete(store, entity,
-				TestUtils.getClock(1));
+				TestUtils.getClock(serial.getAndIncrement()));
 	}
 }
