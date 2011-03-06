@@ -6,12 +6,16 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 import voldemort.store.StorageEngine;
+import voldemort.versioning.ClockEntry;
 import voldemort.versioning.VectorClock;
 
 import com.g414.dgen.EntityGenerator;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 public class VoldemortStorageEngineScenarioBase {
+	protected static AtomicLong serial = new AtomicLong(1);
+
 	@Inject
 	protected StorageEngine store;
 
@@ -20,8 +24,6 @@ public class VoldemortStorageEngineScenarioBase {
 
 	@Inject
 	protected EntityGenerator entityGen;
-
-	protected AtomicLong serial = new AtomicLong(1);
 
 	protected Random random = new Random();
 
@@ -32,8 +34,8 @@ public class VoldemortStorageEngineScenarioBase {
 		String nextId = nextLong.toString();
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.insert(store, entity, new VectorClock(
-				serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.insert(store, entity,
+				getClock(serial.incrementAndGet()));
 
 		this.maxId = nextLong;
 	}
@@ -61,8 +63,8 @@ public class VoldemortStorageEngineScenarioBase {
 				% (this.maxId - 500));
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.insert(store, entity, new VectorClock(
-				serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.insert(store, entity,
+				getClock(serial.incrementAndGet()));
 	}
 
 	public void deleteImpl() throws Exception {
@@ -75,7 +77,12 @@ public class VoldemortStorageEngineScenarioBase {
 				% (this.maxId - 500));
 		final Map<String, Object> entity = entityGen.getEntity(nextId);
 
-		VoldemortStorageEngineOperations.delete(store, entity, new VectorClock(
-				serial.getAndIncrement()));
+		VoldemortStorageEngineOperations.delete(store, entity,
+				getClock(serial.incrementAndGet()));
+	}
+
+	protected VectorClock getClock(long serial) {
+		return new VectorClock(Lists.newArrayList(new ClockEntry((short) 1,
+				serial)), System.currentTimeMillis());
 	}
 }
