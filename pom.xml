@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.g414.voldemort</groupId>
   <artifactId>v-storage-bench</artifactId>
-  <version>0.90</version>
+  <version>0.90.1</version>
 
   <repositories>
     <repository>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>com.g414.voldemort</groupId>
       <artifactId>v-storage-haildb</artifactId>
-      <version>0.90</version>
+      <version>0.90.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
